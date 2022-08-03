@@ -66,6 +66,7 @@ DcsBios::Dimmer internalFloodRedL(0x14be, 3, FloodMap);
 DcsBios::IntegerBuffer pltLightIntentConsoleBuffer(0x121e, 0xf000, 12, onPltLightIntentConsoleChange);
 
 void setup() {
+  pinMode(9, OUTPUT);
   DcsBios::setup();
 }
 
