@@ -13,7 +13,6 @@ DcsBios::IntegerBuffer pltLightIntentConsoleBuffer(0x121e, 0xf000, 12, onPltLigh
  DcsBios::Switch3Pos pltIcsAmpSel("PLT_ICS_AMP_SEL", 7, 8);
  DcsBios::Potentiometer pltIcsVol("PLT_ICS_VOL", A7);
  DcsBios::Switch2Pos pltParkBrake("PLT_PARK_BRAKE", 12, true);
- //DcsBios::Switch2Pos pltLaunchbarAbort("PLT_LAUNCHBAR_ABORT", 6);
  DcsBios::SwitchWithCover2Pos pltLaunchbarAbort("PLT_LAUNCHBAR_ABORT", "PLT_LAUNCHBAR_ABORT_COVER", 6);
 
 void setup() {
