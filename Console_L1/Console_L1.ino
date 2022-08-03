@@ -2,12 +2,6 @@
 #define DCSBIOS_IRQ_SERIAL
 #include <DcsBios.h>
 
-void onAcftNameChange(char* newValue) {
-  // Change of Aircraft
-  DcsBios::resetAllStates();
-}
-DcsBios::StringBuffer<24> AcftNameBuffer(0x0000, onAcftNameChange);
-
 unsigned int posLightsMap(unsigned int dcsValue)
 {
     if( dcsValue == 0 )
@@ -34,3 +28,23 @@ void setup() {
 void loop() {
   DcsBios::loop();
 }
+
+unsigned long uLastModelTimeS = 0xFFFFFFFF; // Start big, to ensure the first step triggers a resync
+
+void onModTimeChange(char* newValue) {
+  unsigned long currentModelTimeS = atol(newValue);
+
+  if( currentModelTimeS < uLastModelTimeS )
+  {
+    if( currentModelTimeS > 20 )// Delay to give time for DCS to finish loading and become stable and responsive
+    {
+      DcsBios::resetAllStates();
+      uLastModelTimeS = currentModelTimeS;
+    }
+  }
+  else
+  {
+    uLastModelTimeS = currentModelTimeS;
+  }
+}
+DcsBios::StringBuffer<5> modTimeBuffer(0x043e, onModTimeChange);

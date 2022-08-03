@@ -71,8 +71,6 @@ void loop() {
 
 unsigned long uLastModelTimeS = 0xFFFFFFFF; // Start big, to ensure the first step triggers a resync
 
-int ledState = false;
-
 void onModTimeChange(char* newValue) {
   unsigned long currentModelTimeS = atol(newValue);
 

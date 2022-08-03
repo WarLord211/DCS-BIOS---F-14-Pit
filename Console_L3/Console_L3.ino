@@ -4,11 +4,6 @@
 
 int LEDBrightness = 30;
 
-void onAcftNameChange(char* newValue) {  // Change of Aircraft
-  DcsBios::resetAllStates();
-}
-DcsBios::StringBuffer<24> AcftNameBuffer(0x0000, onAcftNameChange);
-
 void onPltLightIntentConsoleChange(unsigned int newValue) {
     LEDBrightness = newValue * 31;
 }
@@ -22,6 +17,8 @@ DcsBios::IntegerBuffer pltLightIntentConsoleBuffer(0x121e, 0xf000, 12, onPltLigh
  DcsBios::SwitchWithCover2Pos pltLaunchbarAbort("PLT_LAUNCHBAR_ABORT", "PLT_LAUNCHBAR_ABORT_COVER", 6);
 
 void setup() {
+  pinMode(3, OUTPUT);
+  pinMode(5, OUTPUT);
   DcsBios::setup();
 }
 
@@ -30,3 +27,23 @@ void loop() {
   analogWrite(3, LEDBrightness);
   analogWrite(5, LEDBrightness);
 }
+
+unsigned long uLastModelTimeS = 0xFFFFFFFF; // Start big, to ensure the first step triggers a resync
+
+void onModTimeChange(char* newValue) {
+  unsigned long currentModelTimeS = atol(newValue);
+
+  if( currentModelTimeS < uLastModelTimeS )
+  {
+    if( currentModelTimeS > 20 )// Delay to give time for DCS to finish loading and become stable and responsive
+    {
+      DcsBios::resetAllStates();
+      uLastModelTimeS = currentModelTimeS;
+    }
+  }
+  else
+  {
+    uLastModelTimeS = currentModelTimeS;
+  }
+}
+DcsBios::StringBuffer<5> modTimeBuffer(0x043e, onModTimeChange);
