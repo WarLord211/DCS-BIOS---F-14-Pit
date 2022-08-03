@@ -4,12 +4,6 @@
 
 int LEDBrightness = 10;
 
-void onAcftNameChange(char* newValue) {
-  // Change of Aircraft
-  DcsBios::resetAllStates();
-}
-DcsBios::StringBuffer<24> AcftNameBuffer(0x0000, onAcftNameChange);
-
 unsigned int leftMap(unsigned int dcsValue)
 {
   if( dcsValue >= MIDPOINT ) {
@@ -74,3 +68,25 @@ void loop() {
   DcsBios::loop();
   analogWrite(9, LEDBrightness);
 }
+
+unsigned long uLastModelTimeS = 0xFFFFFFFF; // Start big, to ensure the first step triggers a resync
+
+int ledState = false;
+
+void onModTimeChange(char* newValue) {
+  unsigned long currentModelTimeS = atol(newValue);
+
+  if( currentModelTimeS < uLastModelTimeS )
+  {
+    if( currentModelTimeS > 20 )// Delay to give time for DCS to finish loading and become stable and responsive
+    {
+      DcsBios::resetAllStates();
+      uLastModelTimeS = currentModelTimeS;
+    }
+  }
+  else
+  {
+    uLastModelTimeS = currentModelTimeS;
+  }
+}
+DcsBios::StringBuffer<5> modTimeBuffer(0x043e, onModTimeChange);
